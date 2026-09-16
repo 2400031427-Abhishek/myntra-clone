@@ -15,12 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:8081",
-      "http://localhost:8082",
-      "http://127.0.0.1:8081",
-      "http://127.0.0.1:8082",
-    ],
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
@@ -35,7 +30,7 @@ app.use(express.json());
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-  console.error("❌ MONGO_URI is missing in .env");
+  console.error("❌ MONGO_URI is missing");
 } else {
   mongoose
     .connect(MONGO_URI)
@@ -157,6 +152,7 @@ app.post("/api/auth/signup", async (req, res) => {
   try {
     console.log("====================================");
     console.log("📥 SIGNUP REQUEST RECEIVED");
+
     console.log("Request body:", {
       name: req.body?.name,
       email: req.body?.email,
@@ -166,6 +162,7 @@ app.post("/api/auth/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
     /* Check required fields */
+
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email and password are required",
@@ -173,6 +170,7 @@ app.post("/api/auth/signup", async (req, res) => {
     }
 
     /* Validate name */
+
     if (name.trim().length < 2) {
       return res.status(400).json({
         message: "Name must contain at least 2 characters",
@@ -180,6 +178,7 @@ app.post("/api/auth/signup", async (req, res) => {
     }
 
     /* Validate email */
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email.trim())) {
@@ -189,6 +188,7 @@ app.post("/api/auth/signup", async (req, res) => {
     }
 
     /* Validate password */
+
     if (password.length < 6) {
       return res.status(400).json({
         message: "Password must be at least 6 characters",
@@ -200,6 +200,7 @@ app.post("/api/auth/signup", async (req, res) => {
     console.log("🔍 Checking existing user...");
 
     /* Check existing user */
+
     const existingUser = await User.findOne({
       email: cleanEmail,
     });
@@ -215,11 +216,13 @@ app.post("/api/auth/signup", async (req, res) => {
     console.log("🔐 Hashing password...");
 
     /* Hash password */
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     console.log("👤 Creating user in MongoDB...");
 
     /* Create user */
+
     const user = await User.create({
       name: name.trim(),
       email: cleanEmail,
@@ -229,6 +232,7 @@ app.post("/api/auth/signup", async (req, res) => {
     console.log("✅ User created:", user._id.toString());
 
     /* Create JWT */
+
     const token = jwt.sign(
       {
         userId: user._id.toString(),
@@ -263,13 +267,13 @@ app.post("/api/auth/signup", async (req, res) => {
     console.error("====================================");
 
     /* Duplicate email */
+
     if (error.code === 11000) {
       return res.status(409).json({
         message: "This email is already registered",
       });
     }
 
-    /* DEVELOPMENT ERROR MESSAGE */
     return res.status(500).json({
       message: error.message || "Server error while creating account",
     });
@@ -481,6 +485,6 @@ app.get("/api/orders/:id", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
