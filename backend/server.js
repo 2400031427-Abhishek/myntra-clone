@@ -153,6 +153,17 @@ app.get("/", (req, res) => {
 });
 
 /* ==================================================
+   TEMPORARY TEST ROUTE
+================================================== */
+
+app.get("/test", (req, res) => {
+  res.json({
+    message: "TEST ROUTE WORKING",
+    version: "diagnostic-1",
+  });
+});
+
+/* ==================================================
    AUTHENTICATION - SIGNUP
 ================================================== */
 
@@ -402,10 +413,14 @@ app.get("/api/auth/me", async (req, res) => {
 ================================================== */
 
 app.get("/api/products", (req, res) => {
+  console.log("📦 PRODUCTS REQUEST RECEIVED");
+
   res.json(products);
 });
 
 app.get("/api/products/:id", (req, res) => {
+  console.log("📦 PRODUCT REQUEST:", req.params.id);
+
   const product = products.find((item) => item.id === req.params.id);
 
   if (!product) {
@@ -422,6 +437,8 @@ app.get("/api/products/:id", (req, res) => {
 ================================================== */
 
 app.get("/api/categories", (req, res) => {
+  console.log("📂 CATEGORIES REQUEST RECEIVED");
+
   res.json(categories);
 });
 
@@ -485,6 +502,20 @@ app.get("/api/orders/:id", (req, res) => {
   }
 
   res.json(order);
+});
+
+/* ==================================================
+   404 HANDLER
+================================================== */
+
+app.use((req, res) => {
+  console.log("❌ ROUTE NOT FOUND:", req.method, req.originalUrl);
+
+  res.status(404).json({
+    message: "Route not found",
+    method: req.method,
+    path: req.originalUrl,
+  });
 });
 
 /* ==================================================
