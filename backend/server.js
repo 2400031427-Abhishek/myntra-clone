@@ -143,10 +143,18 @@ const categories = [
 const orders = [];
 
 /* ==================================================
-   AUTHENTICATION
+   ROOT
 ================================================== */
 
-/* ================= SIGNUP ================= */
+app.get("/", (req, res) => {
+  res.json({
+    message: "Myntra Clone API is running 🚀",
+  });
+});
+
+/* ==================================================
+   AUTHENTICATION - SIGNUP
+================================================== */
 
 app.post("/api/auth/signup", async (req, res) => {
   try {
@@ -161,7 +169,7 @@ app.post("/api/auth/signup", async (req, res) => {
 
     const { name, email, password } = req.body;
 
-    /* Check required fields */
+    /* Required fields */
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -169,7 +177,7 @@ app.post("/api/auth/signup", async (req, res) => {
       });
     }
 
-    /* Validate name */
+    /* Name validation */
 
     if (name.trim().length < 2) {
       return res.status(400).json({
@@ -177,7 +185,7 @@ app.post("/api/auth/signup", async (req, res) => {
       });
     }
 
-    /* Validate email */
+    /* Email validation */
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -187,7 +195,7 @@ app.post("/api/auth/signup", async (req, res) => {
       });
     }
 
-    /* Validate password */
+    /* Password validation */
 
     if (password.length < 6) {
       return res.status(400).json({
@@ -266,8 +274,6 @@ app.post("/api/auth/signup", async (req, res) => {
     console.error("Full error:", error);
     console.error("====================================");
 
-    /* Duplicate email */
-
     if (error.code === 11000) {
       return res.status(409).json({
         message: "This email is already registered",
@@ -280,7 +286,9 @@ app.post("/api/auth/signup", async (req, res) => {
   }
 });
 
-/* ================= LOGIN ================= */
+/* ==================================================
+   AUTHENTICATION - LOGIN
+================================================== */
 
 app.post("/api/auth/login", async (req, res) => {
   try {
@@ -345,7 +353,9 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-/* ================= AUTH CHECK ================= */
+/* ==================================================
+   AUTH CHECK
+================================================== */
 
 app.get("/api/auth/me", async (req, res) => {
   try {
@@ -391,12 +401,6 @@ app.get("/api/auth/me", async (req, res) => {
    PRODUCTS
 ================================================== */
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "Myntra Clone API is running 🚀",
-  });
-});
-
 app.get("/api/products", (req, res) => {
   res.json(products);
 });
@@ -412,6 +416,10 @@ app.get("/api/products/:id", (req, res) => {
 
   res.json(product);
 });
+
+/* ==================================================
+   CATEGORIES
+================================================== */
 
 app.get("/api/categories", (req, res) => {
   res.json(categories);
